@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
   img.src = LOGO.file;
 });
   
-const LINKS = { lesteni: 'lesteni.html', kodovani: 'kodovani.html' };
+const LINKS = { lesteni: 'http://machy-detailing.duckdns.org/', kodovani: 'kodovani.html' };
 document.querySelectorAll('[data-link]').forEach(a => a.href = LINKS[a.dataset.link]);
 document.getElementById('yr').textContent = new Date().getFullYear();
 /* ===== LOGO: nahraje logo do horní lišty a do záložky prohlížeče ===== */
