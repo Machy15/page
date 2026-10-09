@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Machač | Leštění laku a kódování vozů</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ===== THEME: change colours here ===== */
+:root{--bg:#0e1217;--card:#161b22;--line:#252d37;--tx:#e9eef3;--mut:#8b98a8;--acc:#19d3ff;--acc2:#3b82f6;
+--glow:0 0 24px rgba(25,211,255,.4);color-scheme:dark;box-sizing:border-box;
+padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*:before,*:after{box-sizing:inherit}
+html{scroll-behavior:smooth;scroll-padding-top:calc(72px + env(safe-area-inset-top,0px))}
+body{margin:0;background:var(--bg) repeating-linear-gradient(45deg,rgba(255,255,255,.018) 0 2px,transparent 2px 5px);
+color:var(--tx);font:16px/1.6 "DM Sans",system-ui,sans-serif}
+h1,h2,h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;line-height:1.05;margin:0;letter-spacing:.01em}
+h2{font-size:clamp(2rem,5vw,3.2rem);margin-bottom:.4em}
+a{color:inherit}
+.wrap{max-width:1100px;margin:auto}
+section{padding:84px 20px}
+.mut{color:var(--mut)}
+.btn{display:inline-block;padding:13px 24px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--tx);
+font:700 15px "DM Sans",sans-serif;text-decoration:none;cursor:pointer;transition:.25s}
+.btn:hover{border-color:var(--acc);box-shadow:var(--glow);transform:translateY(-2px)}
+.btn.pri{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#04121a;border:0}
+:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+/* header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:rgba(14,18,23,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;padding:14px 20px}
+.logo{font:700 1.5rem "Barlow Condensed",sans-serif;text-decoration:none}
+nav a{margin-left:22px;text-decoration:none;color:var(--mut);transition:.2s}
+nav a:hover{color:var(--acc)}
+@media(max-width:640px){nav a:not(.keep){display:none}}
+/* hero */
+.hero{min-height:88vh;display:flex;align-items:center;background:radial-gradient(60% 55% at 78% 30%,rgba(25,211,255,.18),transparent 70%),radial-gradient(40% 40% at 10% 90%,rgba(59,130,246,.14),transparent 70%)}
+.hero h1{font-size:clamp(3rem,9vw,6.4rem);max-width:14ch;animation:rise .9s ease both}
+.hero p{max-width:52ch;color:var(--mut);font-size:1.15rem;margin:22px 0 32px;animation:rise .9s .15s ease both}
+.cta{display:flex;flex-wrap:wrap;gap:12px;animation:rise .9s .3s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(24px)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+/* calculator */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:30px}
+@media(max-width:820px){.calc{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+#car{width:100%;max-width:340px;display:block;margin:auto;touch-action:manipulation}
+/* SVG panel states: .p = clickable, .on = selected */
+.p{fill:#1b222b;stroke:#4a5a6c;stroke-width:1.5;cursor:pointer;transition:.25s;-webkit-tap-highlight-color:transparent}
+.p.dark{fill:#07090c}
+@media(hover:hover){.p:hover{fill:#173341;stroke:var(--acc)}}
+.p.on{fill:rgba(25,211,255,.3);stroke:var(--acc);stroke-width:2;filter:drop-shadow(0 0 6px var(--acc))}
+.d{fill:#0b0e12;stroke:#2d3844;stroke-width:1.5;pointer-events:none}
+.tiers{display:grid;gap:6px;margin:0 0 14px;font-size:.92rem}
+.tiers div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.chip{padding:6px 12px;border-radius:99px;border:1px solid var(--line);background:transparent;color:var(--mut);font:500 13px "DM Sans",sans-serif;cursor:pointer;transition:.2s}
+.chip.on{border-color:var(--acc);color:var(--acc);background:rgba(25,211,255,.1)}
+.wax{display:flex;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);cursor:pointer}
+.wax input{width:20px;height:20px;accent-color:var(--acc)}
+#list{list-style:none;margin:14px 0;padding:0;font-size:.94rem}
+#list li{display:flex;justify-content:space-between;gap:10px;padding:5px 0}
+.total{font:700 2.4rem "Barlow Condensed",sans-serif;color:var(--acc);text-shadow:var(--glow)}
+.row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+/* promo code */
+.pbox{display:flex;gap:8px;margin-top:14px}
+.pbox input[type=text]{flex:1;min-width:0;margin:0;text-transform:uppercase}
+.pbox input[type=text]::placeholder{text-transform:none}
+.pbox input.ok{border-color:var(--acc)}
+.pbox input.bad{border-color:#ff7b8a}
+.pbox .btn{padding:10px 20px}
+.pmsg{font-size:.88rem;margin-top:8px;min-height:1.3em;color:var(--mut)}
+.pmsg.ok{color:var(--acc)}
+.pmsg.err{color:#ff7b8a}
+.badge{display:flex;gap:10px;align-items:flex-start;margin:12px 0;padding:10px 12px;border:1px solid var(--acc);border-radius:10px;background:rgba(25,211,255,.08);font-size:.9rem}
+.badge b{color:var(--acc);font-family:"Barlow Condensed",sans-serif;font-size:1.1rem;line-height:1.3}
+#was{text-decoration:line-through;color:var(--mut);min-height:0}
+input[readonly]{color:var(--acc)}
+/* info tooltip (i) */
+#list li{position:relative}
+.tip{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-left:6px;padding:0;border-radius:50%;border:1px solid var(--acc);background:none;color:var(--acc);font:700 12px/1 "DM Sans",sans-serif;cursor:help;vertical-align:middle}
+.tip span{display:none;position:absolute;left:0;right:0;bottom:calc(100% + 6px);padding:10px 12px;border-radius:8px;background:#0b0f14;border:1px solid var(--acc);color:var(--tx);font:400 13px/1.45 "DM Sans",sans-serif;text-align:left;box-shadow:var(--glow);z-index:5}
+.tip:hover span,.tip:focus-visible span,.tip.open span{display:block}
+.ok-row{color:var(--acc)}
+/* gallery */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px;margin-top:30px}
+.ba{position:relative;aspect-ratio:16/10;overflow:hidden;border-radius:10px;--p:50%;user-select:none}
+.ba img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ba .b{clip-path:inset(0 calc(100% - var(--p)) 0 0)}
+.ba .h{position:absolute;top:0;bottom:0;left:var(--p);width:2px;background:var(--acc);box-shadow:var(--glow)}
+.ba .h:after{content:"";position:absolute;top:50%;left:-13px;width:28px;height:28px;margin-top:-14px;border-radius:50%;background:var(--bg);border:2px solid var(--acc)}
+.ba input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;touch-action:pan-y;margin:0}
+.tag{position:absolute;top:10px;padding:2px 10px;border-radius:99px;background:rgba(0,0,0,.6);font-size:12px}
+figcaption{padding-top:12px;font-weight:700}
+figure{margin:0}
+/* contact */
+.contact{display:grid;grid-template-columns:1.4fr 1fr;gap:28px;margin-top:30px}
+@media(max-width:820px){.contact{grid-template-columns:1fr}}
+label{display:block;font-size:.88rem;color:var(--mut);margin-bottom:14px}
+input[type=text],input[type=email],input[type=tel],textarea{width:100%;margin-top:5px;padding:12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--tx);font:inherit}
+input:focus,textarea:focus{border-color:var(--acc);outline:0;box-shadow:var(--glow)}
+.info a{display:block;text-decoration:none;margin-bottom:16px;transition:.25s}
+.info a:hover{border-color:var(--acc);box-shadow:var(--glow)}
+.info b{display:block;font:700 1.3rem "Barlow Condensed",sans-serif}
+footer{border-top:1px solid var(--line);padding:34px 20px;color:var(--mut);font-size:.92rem}
+footer .wrap{display:flex;flex-wrap:wrap;gap:16px 28px;justify-content:space-between}
+footer a{margin-right:16px;text-decoration:none}
+footer a:hover{color:var(--acc)}
+
+/* services, coding, form select */
+.svc{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:30px}
+@media(max-width:820px){.svc{grid-template-columns:1fr}}
+.svc a.card{text-decoration:none;transition:.25s}
+.svc a.card:hover{border-color:var(--acc);box-shadow:var(--glow);transform:translateY(-3px)}
+.svc h3{font-size:2rem;margin-bottom:8px}
+.svc b{color:var(--acc)}
+.about p{max-width:68ch;margin:0 0 12px}
+.brands{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 6px}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin:14px 0 20px}
+.opt{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--tx);font:inherit;text-align:left;cursor:pointer;transition:.2s}
+.opt small{display:block;color:var(--mut)}
+.opt b{color:var(--acc);white-space:nowrap}
+.opt.on{border-color:var(--acc);background:rgba(25,211,255,.1);box-shadow:var(--glow)}
+</style>
+</head>
+<body>
+
+<header><div class="wrap">
+  <a class="logo" href="#top">Machač</a>
+  <nav><a data-link="lesteni">Leštění</a><a data-link="kodovani">Kódování</a><a class="keep" href="#kontakt">Kontakt</a></nav>
+</div></header>
+<main id="top">
+<section class="hero"><div class="wrap">
+  <h1>Leštění laku nebo kódování vozu?</h1>
+  <p>Vyberte si, s čím vám mohu pomoct. Každé auto beru individuálně a nejdřív se domluvíme na rozsahu a ceně.</p>
+  <div class="cta">
+    <a class="btn pri" data-link="lesteni">Leštění laku</a>
+    <a class="btn" data-link="kodovani">Kódování vozů</a>
+  </div>
+</div></section>
+
+<section id="sluzby"><div class="wrap">
+  <h2>Vyberte si službu</h2>
+  <div class="svc">
+    <a class="card" data-link="lesteni"><h3>Leštění a korekce laku</h3><p class="mut">Odstranění škrábanců a hologramů, hluboký lesk a ochrana laku. Cenu si spočítáte v interaktivní kalkulačce.</p><b>Přejít na leštění</b></a>
+    <a class="card" data-link="kodovani"><h3>Kódování vozů VAG</h3><p class="mut">Škoda, Volkswagen, Audi, Seat a další. Vyberte značku a úpravy, které chcete aktivovat.</p><b>Přejít na kódování</b></a>
+  </div>
+</div></section>
+
+<!-- EDIT: nahraďte vlastním textem o sobě -->
+<section id="o-mne"><div class="wrap about">
+  <h2>O mně</h2>
+  <div class="card">
+    <p>Věnuji se korekci laku a detailingu a kódování vozů koncernu VAG (Škoda, Volkswagen, Audi, Seat).</p>
+    <p class="mut">Sem napište pár vět o sobě: jak dlouho se tomu věnujete, jaké máte zkušenosti a čím se odlišujete.</p>
+  </div>
+</div></section>
+
+<section id="kontakt"><div class="wrap">
+  <h2>Kontakt</h2>
+  <div class="info" style="display:grid;gap:16px;max-width:520px;margin-top:20px">
+    <a class="card" href="mailto:machactomas@proton.me"><span class="mut">E-mail</span><b>machactomas@proton.me</b></a>
+      <a class="card" href="https://instagram.com/machac__tomas" target="_blank" rel="noopener"><span class="mut">Instagram</span><b>@machac__tomas</b></a>
+  </div>
+</div></section>
+</main>
+<footer><div class="wrap">
+  <div><a data-link="lesteni">Leštění</a><a data-link="kodovani">Kódování</a><a href="#kontakt">Kontakt</a></div>
+  <div><a href="https://instagram.com/machac__tomas" target="_blank" rel="noopener">Instagram</a><a href="mailto:machactomas@proton.me">E-mail</a></div>
+  <div>© <span id="yr"></span> Machač. Všechna práva vyhrazena.</div>
+</div></footer>
+
+<script>
+/* ===================================================================
+   ODKAZY NA SLUŽBY. Replace with your custom URLs, e.g.
+   lesteni: 'https://moje-domena.duckdns.org/lesteni.html'
+   =================================================================== */
+const LINKS = { lesteni: 'lesteni.html', kodovani: 'kodovani.html' };
+document.querySelectorAll('[data-link]').forEach(a => a.href = LINKS[a.dataset.link]);
+document.getElementById('yr').textContent = new Date().getFullYear();
+/* ===== LOGO: nahraje logo do horní lišty a do záložky prohlížeče ===== */
+const LOGO = {
+  file: 'logo.png',   // název souboru s logem (nahraj ho na GitHub vedle index.html)
+  height: 40,         // výška loga v liště (px)
+  favicon: true       // true = logo i jako ikonka v záložce
+};
+document.addEventListener('DOMContentLoaded', () => {
+  const link = document.querySelector('.logo');      // odkaz s názvem v horní liště
+  const img = new Image();
+  img.onload = () => {                               // spustí se jen když soubor existuje
+    img.alt = 'Machač Detailing';
+    img.style.cssText = `height:${LOGO.height}px;width:auto;display:block`;
+    link.textContent = '';
+    link.appendChild(img);
+    if (LOGO.favicon) {
+      const f = document.querySelector('link[rel~="icon"]') || document.head.appendChild(Object.assign(document.createElement('link'), { rel: 'icon' }));
+      f.href = LOGO.file;
+    }
+  };
+  img.src = LOGO.file;
+});
+</script>
+</body>
+</html>
