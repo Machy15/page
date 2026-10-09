@@ -172,9 +172,33 @@ footer a:hover{color:var(--acc)}
 
 <script>
 /* ===================================================================
+
+
    ODKAZY NA SLUŽBY. Replace with your custom URLs, e.g.
    lesteni: 'https://moje-domena.duckdns.org/lesteni.html'
    =================================================================== */
+
+  const LOGO = {
+  file: 'logo.png',   // název souboru s logem (nahraj ho na GitHub vedle index.html)
+  height: 40,         // výška loga v liště (px)
+  favicon: true       // true = logo i jako ikonka v záložce
+};
+document.addEventListener('DOMContentLoaded', () => {
+  const link = document.querySelector('.logo');      // odkaz s názvem v horní liště
+  const img = new Image();
+  img.onload = () => {                               // spustí se jen když soubor existuje
+    img.alt = 'Machač Detailing';
+    img.style.cssText = `height:${LOGO.height}px;width:auto;display:block`;
+    link.textContent = '';
+    link.appendChild(img);
+    if (LOGO.favicon) {
+      const f = document.querySelector('link[rel~="icon"]') || document.head.appendChild(Object.assign(document.createElement('link'), { rel: 'icon' }));
+      f.href = LOGO.file;
+    }
+  };
+  img.src = LOGO.file;
+});
+  
 const LINKS = { lesteni: 'lesteni.html', kodovani: 'kodovani.html' };
 document.querySelectorAll('[data-link]').forEach(a => a.href = LINKS[a.dataset.link]);
 document.getElementById('yr').textContent = new Date().getFullYear();
